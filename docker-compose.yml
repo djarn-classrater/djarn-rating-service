@@ -1,12 +1,28 @@
 version: '3.1'
 
 services:
+  rating:
+    build: .
+    restart: always
+    ports:
+      - 3004:3000
+    networks:
+      - djarn
 
-  db:
+  ratingDb:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     ports:
-      - 3306:3306
+      - 3308:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: 1234
+    network:
+      - djarn
+
+networks:
+  djarn:
+    external: true
