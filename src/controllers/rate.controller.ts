@@ -20,10 +20,18 @@ import {
 import {Rate} from '../models';
 import {RateRepository} from '../repositories';
 
+class Rating {
+  1 = 0;
+  2 = 0;
+  3 = 0;
+  4 = 0;
+  5 = 0;
+}
+
 export class RateController {
   constructor(
     @repository(RateRepository)
-    public rateRepository : RateRepository,
+    public rateRepository: RateRepository,
   ) {}
 
   @post('/rates', {
@@ -80,9 +88,61 @@ export class RateController {
     },
   })
   async find(
-    @param.query.object('filter', getFilterSchemaFor(Rate)) filter?: Filter<Rate>,
+    @param.query.object('filter', getFilterSchemaFor(Rate))
+    filter?: Filter<Rate>,
   ): Promise<Rate[]> {
     return this.rateRepository.find(filter);
+  }
+
+  @get('rates/{courseId}/summary', {
+    responses: {
+      '200': {
+        description: 'Array of course summary',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              title: 'Course Summary',
+              properties: {
+                mean: {type: 'number'},
+                reviewer: {type: 'number'},
+                rating: {
+                  type: 'object',
+                  title: 'Number of each rating',
+                  properties: {
+                    1: {type: 'number'},
+                    2: {type: 'number'},
+                    3: {type: 'number'},
+                    4: {type: 'number'},
+                    5: {type: 'number'},
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async getSummary(@param.path.string('courseId') courseId: string) {
+    const ratingTuples = await this.rateRepository.find({where: {courseId}});
+
+    const sumRating = ratingTuples.reduce<number>((previous, current) => {
+      return previous + current.rating;
+    }, 0);
+
+    const mean = sumRating / ratingTuples.length;
+
+    const rating = ratingTuples.reduce<Rating>((previous, current) => {
+      previous[current.rating] += 1;
+      return previous;
+    }, new Rating());
+
+    return {
+      mean,
+      reviewer: ratingTuples.length,
+      rating,
+    };
   }
 
   @patch('/rates', {
@@ -121,7 +181,8 @@ export class RateController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.query.object('filter', getFilterSchemaFor(Rate)) filter?: Filter<Rate>
+    @param.query.object('filter', getFilterSchemaFor(Rate))
+    filter?: Filter<Rate>,
   ): Promise<Rate> {
     return this.rateRepository.findById(id, filter);
   }

@@ -1,5 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
+type RateLength = 1 | 2 | 3 | 4 | 5;
+
 @model()
 export class Rate extends Entity {
   @property({
@@ -23,9 +25,9 @@ export class Rate extends Entity {
 
   @property({
     type: 'number',
+    require: true,
   })
-  rating?: number;
-
+  rating: RateLength;
 
   constructor(data?: Partial<Rate>) {
     super(data);
