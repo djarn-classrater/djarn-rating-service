@@ -21,11 +21,12 @@ import {Rate} from '../models';
 import {RateRepository} from '../repositories';
 
 class Rating {
-  1 = 0;
-  2 = 0;
-  3 = 0;
-  4 = 0;
-  5 = 0;
+  _1 = 0;
+  _2 = 0;
+  _3 = 0;
+  _4 = 0;
+  _5 = 0;
+  [key: string]: number;
 }
 
 export class RateController {
@@ -110,11 +111,11 @@ export class RateController {
                   type: 'object',
                   title: 'Number of each rating',
                   properties: {
-                    1: {type: 'number'},
-                    2: {type: 'number'},
-                    3: {type: 'number'},
-                    4: {type: 'number'},
-                    5: {type: 'number'},
+                    _1: {type: 'number'},
+                    _2: {type: 'number'},
+                    _3: {type: 'number'},
+                    _4: {type: 'number'},
+                    _5: {type: 'number'},
                   },
                 },
               },
@@ -134,7 +135,8 @@ export class RateController {
     const mean = sumRating / ratingTuples.length;
 
     const rating = ratingTuples.reduce<Rating>((previous, current) => {
-      previous[current.rating] += 1;
+      const index = `_${current.rating}`;
+      previous[index] += 1;
       return previous;
     }, new Rating());
 
