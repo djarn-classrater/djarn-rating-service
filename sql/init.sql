@@ -1,6 +1,6 @@
 create schema if not exists rating collate utf8mb4_0900_ai_ci;
 
-create table if not exists Rate
+create table if not exists rating.Rate
 (
 	id int auto_increment
 		primary key,
