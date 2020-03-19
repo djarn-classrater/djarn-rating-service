@@ -88,10 +88,10 @@ export class RateController {
     },
   })
   async find(
-    @param.query.object('filter', getFilterSchemaFor(Rate))
-    filter?: Filter<Rate>,
+    @param.query.string('studentId') studentId?: string,
+    @param.query.string('courseId') courseId?: string,
   ): Promise<Rate[]> {
-    return this.rateRepository.find(filter);
+    return this.rateRepository.find({where: {studentId, courseId}});
   }
 
   @get('rates/{courseId}/summary', {
