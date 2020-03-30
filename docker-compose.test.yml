@@ -1,0 +1,30 @@
+version: "2.1"
+
+services:
+  rating:
+    build: .
+    command: yarn test --exit
+    ports:
+      - 3004:3000
+    depends_on:
+      ratingDb:
+        condition: service_healthy
+
+  ratingDb:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3308:3306
+    volumes:
+      - ratingDb:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+volumes:
+  ratingDb:
